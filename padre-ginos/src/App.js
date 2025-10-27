@@ -11,7 +11,7 @@ const App = () =>  {
           React.createElement("h1", {}, "Padre Gino's"),
           React.createElement(pizza, {
               name: "Pepporni Pizza",
-              description: "pizza"
+              description: "Mozzarella Cheese, Pepperoni"
           }),
           React.createElement(pizza, {
             name: "American cheese Pizza",
@@ -19,7 +19,7 @@ const App = () =>  {
         }),
         React.createElement(pizza, {
             name: "Hawaii Pizza",
-            description: "Pineapple"
+            description: "Mozzarella Cheese, Pepperoni"
         }),
         React.createElement(pizza, {
             name: "Chicken Pizza",
