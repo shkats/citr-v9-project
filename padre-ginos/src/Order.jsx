@@ -1,36 +1,35 @@
-import { useEffect, useState } from "react"; //useState - hooks, useEffect - api 
+import { useState, useEffect } from "react"; //useState - hooks, useEffect - api
 import { Pizza } from "./Pizza";
 
-var intl = new Intl.NumberFormat('en-us',
-  {
-    style: "currency",
-    currency: "USD"
-  }
-)
+const intl = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+});
 
 export default function Order() {
-  const [pizzaTypes, setPizzaTypes] = useState([]);
   const [pizzaType, setPizzaType] = useState("pepperoni");
   const [pizzaSize, setPizzaSize] = useState("M");
+  const [pizzaTypes, setPizzaTypes] = useState([]);
   const [loading, setLoading] = useState(true);
 
   let price, selectedPizza;
-
   if (!loading) {
-    selectedPizza = pizzaTypes.find(pizza => pizzaType === pizza.id)
-  }
-
-  async function fetchPizzaTypes() {
-    const pizzaRes = await fetch("/api/pizzas");
-    const pizzaJson = await pizzaRes.json();
-    console.log(pizzaJson);
-    setPizzaTypes(pizzaJson);
-    setLoading(false);
+    selectedPizza = pizzaTypes.find((pizza) => pizzaType === pizza.id);
+    price = intl.format(
+      selectedPizza.sizes ? selectedPizza.sizes[pizzaSize] : "",
+    );
   }
 
   useEffect(() => {
-    fetchPizzaTypes();
+    fetchPizzaTypes(); //prevents multiple load
   }, []);
+
+  async function fetchPizzaTypes() {
+    const pizzasRes = await fetch("/api/pizzas");
+    const pizzasJson = await pizzasRes.json();
+    setPizzaTypes(pizzasJson);
+    setLoading(false);
+  }
 
   return (
     <div className="order">
@@ -44,8 +43,7 @@ export default function Order() {
               name="pizza-type"
               value={pizzaType}
             >
-              {
-               pizzaTypes.map((pizza) => (
+              {pizzaTypes.map((pizza) => (
                 <option key={pizza.id} value={pizza.id}>
                   {pizza.name}
                 </option>
@@ -57,8 +55,8 @@ export default function Order() {
             <div>
               <span>
                 <input
-                  checked={pizzaSize === "S"}
                   onChange={(e) => setPizzaSize(e.target.value)}
+                  checked={pizzaSize === "S"}
                   type="radio"
                   name="pizza-size"
                   value="S"
@@ -68,8 +66,8 @@ export default function Order() {
               </span>
               <span>
                 <input
-                  checked={pizzaSize === "M"}
                   onChange={(e) => setPizzaSize(e.target.value)}
+                  checked={pizzaSize === "M"}
                   type="radio"
                   name="pizza-size"
                   value="M"
@@ -79,8 +77,8 @@ export default function Order() {
               </span>
               <span>
                 <input
-                  checked={pizzaSize === "L"}
                   onChange={(e) => setPizzaSize(e.target.value)}
+                  checked={pizzaSize === "L"}
                   type="radio"
                   name="pizza-size"
                   value="L"
@@ -92,14 +90,18 @@ export default function Order() {
           </div>
           <button type="submit">Add to Cart</button>
         </div>
-        <div className="order-pizza">
-          <Pizza
-            name="Pepperoni"
-            description="Mozzarella Cheese, Pepperoni"
-            image="/public/pizzas/pepperoni.webp"
-          />
-          <p>$13.37</p>
-        </div>
+        {loading ? (
+          <h3>LOADING …</h3>
+        ) : (
+          <div className="order-pizza">
+            <Pizza
+              name={selectedPizza.name}
+              description={selectedPizza.description}
+              image={selectedPizza.image}
+            />
+            <p>{price}</p>
+          </div>
+        )}
       </form>
     </div>
   );
